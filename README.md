@@ -17,7 +17,7 @@ import { createLogger, LogMessage } from 'graylog-logger';
 const customConfig = {
   GRAYLOG_HOST: 'graylog.example.com',
   GRAYLOG_PORT: 12201,
-  GRAYLOG_TRANSPORT: 'tcp',
+  GRAYLOG_TRANSPORT: 'udp',
   GRAYLOG_OUTPUT: 'both',
   additionalFields: {
     service: 'user-service',
