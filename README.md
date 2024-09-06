@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# graylog-logger
-Pacote para captura e envio de logs para o Graylog com integração fácil e configurável.
-=======
 # Graylog Logger
 
 Pacote para captura e envio de logs para o Graylog com integração fácil e configurável. Também suporta logging local no console.
@@ -54,4 +50,3 @@ logger.error(errorLog, remoteAddr);
 
 
 ```
->>>>>>> 536250e (Initial Commit)
