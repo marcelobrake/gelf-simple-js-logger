@@ -1,0 +1,19 @@
+# gelf-simple-js-logger
+
+Copyright 2024 Brake Soluções em TI Ltda
+
+This product includes software developed at Brake Soluções em TI Ltda (<https://github.com/marcelobrake>).
+
+Licensed under the GNU General Public License v3.0. You may use, distribute, and modify this code under the terms of the GPLv3.
+
+Any derivative work or modification of this library must:
+
+- Attribute the original work to "Brake Soluções em TI Ltda" by providing a link to the original repository (<https://github.com/marcelobrake/gelf-simple-js-logger>).
+
+- Distribute the derivative work under the same GPLv3 license, ensuring that the source code remains open.
+
+No warranty is provided with this software.
+
+The original author of this library retains all rights to the original code and documentation provided within this repository.
+
+[Optional: Include additional notices regarding third-party libraries or dependencies used within your library, if any]
