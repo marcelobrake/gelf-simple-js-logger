@@ -21,13 +21,13 @@ npm install gelf-simple-js-logger
 // logger-config.js
 module.exports = {
     GRAYLOG_HOST: '127.0.0.1', // Replace with your Graylog server address
-    GRAYLOG_TRANSPORT: 'udp', // or 'tcp' or 'http'
+    GRAYLOG_TRANSPORT: 'udp', // or 'tcp'
     GRAYLOG_PORT: 12201,
     GRAYLOG_APPLICATION_NAME: 'my_app',
     GRAYLOG_ENVIRONMENT: 'development',
     GRAYLOG_MIN_LEVEL_LOCAL: 'debug',
     GRAYLOG_MIN_LEVEL_REMOTE: 'info',
-    GRAYLOG_OUTPUT: 'both'
+    GRAYLOG_OUTPUT: 'both' // both, local or remote
 };
 
 ```
@@ -57,14 +57,14 @@ logger.info({ message: 'Information log test' });
 No value is required. But it is recommended to send the `message` and/or `full_message` values.
 Any other value sent becomes additional fields on the Graylog Server, in addition to the fields that are already sent by default:
 
-* host (get by function os.hostname())
-* short_message (get by message field or if null 'No message')
-* full_message (get by full_message field or equals message field)
-* level (get by function - debug, info, warn, error or critical)
-* application_name (get by ENV GRAYLOG_APPLICATION_NAME )
-* environment (get by ENV GRAYLOG_ENVIRONMENT)
-* remote_addr (get public IP via https://checkip.amazonaws.com)
-* timestamp (get by new Date().toISOString() command)
+* **host** (get by function os.hostname())
+* **short_message** (get by message field or if null 'No message')
+* **full_message** (get by full_message field or equals message field)
+* **level** (get by function - debug, info, warn, error or critical)
+* **application_name** (get by ENV GRAYLOG_APPLICATION_NAME )
+* **environment** (get by ENV GRAYLOG_ENVIRONMENT)
+* **remote_addr** (get public IP via https://checkip.amazonaws.com)
+* **timestamp** (get by new Date().toISOString() command)
 
 3.**Run your project:** Execute your project to see the logs being sent to Graylog.
 
@@ -82,32 +82,3 @@ node --expose-gc test.js
 * **GRAYLOG_MIN_LEVEL_LOCAL:** The minimum log level for local logging.
 * **GRAYLOG_MIN_LEVEL_REMOTE:** The minimum log level for remote logging.
 * **GRAYLOG_OUTPUT:** Where to output logs (console, graylog, or both).
-
-## Português
-
-Descrição
-gelf-simple-js-logger é um logger simples que envia logs para o Graylog usando o protocolo GELF (Graylog Extended Log Format). Este pacote permite configurar o logger para enviar logs via UDP, TCP ou HTTP.
-
-Instalação
-Para instalar o pacote, use o npm:
-
-Uso
-Crie um arquivo de configuração: Crie um arquivo chamado logger-config.js com o seguinte conteúdo:
-
-Crie um wrapper para o logger: Crie um arquivo chamado logger-wrapper.js para passar a configuração para o logger.
-
-Use o logger no seu projeto: Importe e use o logger nos arquivos do seu projeto.
-
-Execute seu projeto: Execute seu projeto para ver os logs sendo enviados para o Graylog.
-
-Opções de Configuração
-GRAYLOG_HOST: O endereço do seu servidor Graylog.
-GRAYLOG_TRANSPORT: O protocolo de transporte a ser usado (udp, tcp ou http).
-GRAYLOG_PORT: A porta na qual o Graylog está ouvindo.
-GRAYLOG_APPLICATION_NAME: O nome da sua aplicação.
-GRAYLOG_ENVIRONMENT: O ambiente (por exemplo, development, production).
-GRAYLOG_MIN_LEVEL_LOCAL: O nível mínimo de log para logs locais.
-GRAYLOG_MIN_LEVEL_REMOTE: O nível mínimo de log para logs remotos.
-GRAYLOG_OUTPUT: Onde enviar os logs (console, graylog ou both).
-```
-
