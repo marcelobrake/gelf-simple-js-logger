@@ -1,28 +1,35 @@
 {
-    "name": "gelf-simple-js-logger",
-    "version": "1.0.0",
-    "description": "Pacote para captura e envio de logs no formato GELF para Graylog",
-    "main": "src/logger.js",
-    "scripts": {
-      "start": "node --expose-gc src/logger.js"
-    },
-    "dependencies": {
-      "axios": "^1.7.7",
-      "chalk": "^5.3.0"
-    },
-    "devDependencies": {},
-    "engines": {
-      "node": ">=20"
-    },
-    "keywords": [
-      "logger",
-      "gelf",
-      "graylog",
-      "logs",
-      "udp",
-      "tcp"
-    ],
-    "author": "Marcelo Brake",
-    "license": "GPLv3"
-  }
-  
+  "name": "gelf-simple-js-logger",
+  "version": "1.0.0",
+  "description": "Package for capturing and sending logs in GELF format to Graylog",
+  "main": "src/logger.js",
+  "scripts": {
+    "start": "node --expose-gc src/logger.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "chalk": "^5.3.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14"
+  },
+  "keywords": [
+    "logger",
+    "gelf",
+    "graylog",
+    "logs",
+    "udp",
+    "tcp"
+  ],
+  "author": "Marcelo Brake",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcelobrake/gelf-simple-js-logger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marcelobrake/gelf-simple-js-logger/issues"
+  },
+  "homepage": "https://github.com/marcelobrake/gelf-simple-js-logger#readme"
+}
