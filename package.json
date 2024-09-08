@@ -1,6 +1,6 @@
 {
   "name": "gelf-simple-js-logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Package for capturing and sending logs in GELF format to Graylog",
   "main": "src/logger.js",
   "scripts": {
