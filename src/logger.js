@@ -1,10 +1,7 @@
-// logger.js
-const dgram = require('dgram');
 const net = require('net');
 const os = require('os');
 const axios = require('axios');
-const config = require('./gelf-logger-config');
-
+const dgram = require('dgram');
 
 // Function to get the remote IP address
 async function getRemoteAddress() {
@@ -17,8 +14,8 @@ async function getRemoteAddress() {
     }
 }
 
-// Function to create a GELF formatted message
-async function createGelfMessage(level, logObject) {
+// Function to create a formatted GELF message
+async function createGelfMessage(level, logObject, config) {
     const remoteAddress = await getRemoteAddress();
     const hostname = os.hostname();
 
@@ -51,7 +48,7 @@ function mapLogLevel(level) {
 }
 
 // Function to send logs via UDP
-function sendUdpMessage(message) {
+function sendUdpMessage(message, config) {
     const client = dgram.createSocket('udp4');
     const jsonMessage = Buffer.from(JSON.stringify(message));
 
@@ -62,7 +59,7 @@ function sendUdpMessage(message) {
 }
 
 // Function to send logs via TCP
-function sendTcpMessage(message) {
+function sendTcpMessage(message, config) {
     const client = new net.Socket();
     const jsonMessage = JSON.stringify(message);
 
@@ -77,11 +74,11 @@ function sendTcpMessage(message) {
 }
 
 // Function to send the log based on the chosen transport
-function sendLogToGraylog(message) {
+function sendLogToGraylog(message, config) {
     if (config.GRAYLOG_TRANSPORT === 'udp') {
-        sendUdpMessage(message);
+        sendUdpMessage(message, config);
     } else if (config.GRAYLOG_TRANSPORT === 'tcp') {
-        sendTcpMessage(message);
+        sendTcpMessage(message, config);
     } else {
         console.error('Invalid transport protocol. Use "udp" or "tcp".');
     }
@@ -105,8 +102,8 @@ function logToConsole(level, logObject) {
 }
 
 // Main log function
-async function log(level, logObject) {
-    const gelfMessage = await createGelfMessage(level, logObject);
+async function log(level, logObject, config) {
+    const gelfMessage = await createGelfMessage(level, logObject, config);
 
     // Conditions for console and/or Graylog output
     if (config.GRAYLOG_OUTPUT === 'both' || config.GRAYLOG_OUTPUT === 'local') {
@@ -114,18 +111,35 @@ async function log(level, logObject) {
     }
 
     if (config.GRAYLOG_OUTPUT === 'both' || config.GRAYLOG_OUTPUT === 'remote') {
-        sendLogToGraylog(gelfMessage);
+        sendLogToGraylog(gelfMessage, config);
     }
 
     // Force garbage collection (if available)
     if (global.gc) global.gc();
 }
 
-// Log level functions
-module.exports = {
-    debug: (logObject) => log('debug', logObject),
-    info: (logObject) => log('info', logObject),
-    warn: (logObject) => log('warn', logObject),
-    error: (logObject) => log('error', logObject),
-    critical: (logObject) => log('critical', logObject)
-};
+// Function to initialize the logger with configurations
+function createLogger(customConfig = {}) {
+    const defaultConfig = {
+        GRAYLOG_HOST: process.env.GRAYLOG_HOST || '127.0.0.1',
+        GRAYLOG_TRANSPORT: process.env.GRAYLOG_TRANSPORT || 'udp', // udp or tcp
+        GRAYLOG_PORT: process.env.GRAYLOG_PORT || 12201,
+        GRAYLOG_APPLICATION_NAME: process.env.GRAYLOG_APPLICATION_NAME || 'my-application',
+        GRAYLOG_ENVIRONMENT: process.env.GRAYLOG_ENVIRONMENT || 'development',
+        GRAYLOG_MIN_LEVEL_LOCAL: process.env.GRAYLOG_MIN_LEVEL_LOCAL || 'debug',
+        GRAYLOG_MIN_LEVEL_REMOTE: process.env.GRAYLOG_MIN_LEVEL_REMOTE || 'info',
+        GRAYLOG_OUTPUT: process.env.GRAYLOG_OUTPUT || 'both', // local, remote, both
+    };
+
+    const config = { ...defaultConfig, ...customConfig };
+
+    return {
+        debug: (logObject) => log('debug', { ...logObject, stringLevel: 'debug' }, config),
+        info: (logObject) => log('info', { ...logObject, stringLevel: 'info' }, config),
+        warn: (logObject) => log('warn', { ...logObject, stringLevel: 'warn' }, config),
+        error: (logObject) => log('error', { ...logObject, stringLevel: 'error' }, config),
+        critical: (logObject) => log('critical', { ...logObject, stringLevel: 'critical' }, config)
+    };
+}
+
+module.exports = createLogger;
