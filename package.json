@@ -1,14 +1,13 @@
 {
   "name": "gelf-simple-js-logger",
-  "version": "1.0.1",
-  "description": "Package for capturing and sending logs in GELF format to Graylog",
+  "version": "1.0.2",
+  "description": "gelf-simple-js-logger is a simple logger that sends logs to Graylog using the GELF (Graylog Extended Log Format) protocol and console. This package allows you to configure the logger to send logs via UDP or TCP.",
   "main": "src/logger.js",
   "scripts": {
     "start": "node --expose-gc src/logger.js"
   },
   "dependencies": {
-    "axios": "^1.7.7",
-    "chalk": "^5.3.0"
+    "axios": "^1.7.7"
   },
   "devDependencies": {},
   "engines": {
