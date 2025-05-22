@@ -142,4 +142,5 @@ function createLogger(customConfig = {}) {
     };
 }
 
-module.exports = createLogger;
+// Exporting for testing purposes
+module.exports = { createLogger, mapLogLevel, createGelfMessage, getRemoteAddress, logToConsole, sendUdpMessage, sendTcpMessage, sendLogToGraylog, log };
