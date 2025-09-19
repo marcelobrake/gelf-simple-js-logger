@@ -1,25 +1,26 @@
-const net = require('net');
-const os = require('os');
-const axios = require('axios');
-const dgram = require('dgram');
+import * as net from 'net';
+import * as os from 'os';
+import axios from 'axios';
+import * as dgram from 'dgram';
+import { LogLevel, Transport, LoggerConfig, LogObject, GelfMessage, Logger } from './types';
 
 // Function to get the remote IP address
-async function getRemoteAddress() {
+export async function getRemoteAddress(): Promise<string> {
     try {
         const response = await axios.get('https://checkip.amazonaws.com/');
         return response.data.trim();
     } catch (error) {
-        console.error('Error getting remote IP:', error.message);
+        console.error('Error getting remote IP:', (error as Error).message);
         return '0.0.0.0'; // Default value if failed
     }
 }
 
 // Function to create a formatted GELF message
-async function createGelfMessage(level, logObject, config) {
+export async function createGelfMessage(level: LogLevel, logObject: LogObject, config: LoggerConfig): Promise<GelfMessage> {
     const remoteAddress = await getRemoteAddress();
     const hostname = os.hostname();
 
-    const gelfMessage = {
+    const gelfMessage: GelfMessage = {
         version: "1.1",
         host: hostname,
         short_message: logObject.message || "No message",
@@ -36,8 +37,8 @@ async function createGelfMessage(level, logObject, config) {
 }
 
 // Function to map log level to Graylog levels
-function mapLogLevel(level) {
-    const levels = {
+export function mapLogLevel(level: LogLevel): number {
+    const levels: Record<LogLevel, number> = {
         debug: 7,
         info: 6,
         warn: 4,
@@ -48,7 +49,7 @@ function mapLogLevel(level) {
 }
 
 // Function to send logs via UDP
-function sendUdpMessage(message, config) {
+export function sendUdpMessage(message: GelfMessage, config: LoggerConfig): void {
     const client = dgram.createSocket('udp4');
     const jsonMessage = Buffer.from(JSON.stringify(message));
 
@@ -59,7 +60,7 @@ function sendUdpMessage(message, config) {
 }
 
 // Function to send logs via TCP
-function sendTcpMessage(message, config) {
+export function sendTcpMessage(message: GelfMessage, config: LoggerConfig): void {
     const client = new net.Socket();
     const jsonMessage = JSON.stringify(message);
 
@@ -74,7 +75,7 @@ function sendTcpMessage(message, config) {
 }
 
 // Function to send the log based on the chosen transport
-function sendLogToGraylog(message, config) {
+export function sendLogToGraylog(message: GelfMessage, config: LoggerConfig): void {
     if (config.GRAYLOG_TRANSPORT === 'udp') {
         sendUdpMessage(message, config);
     } else if (config.GRAYLOG_TRANSPORT === 'tcp') {
@@ -85,7 +86,7 @@ function sendLogToGraylog(message, config) {
 }
 
 // Function to log to the console
-function logToConsole(level, logObject) {
+export function logToConsole(level: LogLevel, logObject: LogObject): void {
     const timestamp = new Date().toISOString();
 
     console.log(
@@ -102,7 +103,7 @@ function logToConsole(level, logObject) {
 }
 
 // Main log function
-async function log(level, logObject, config) {
+export async function log(level: LogLevel, logObject: LogObject, config: LoggerConfig): Promise<void> {
     const gelfMessage = await createGelfMessage(level, logObject, config);
 
     // Conditions for console and/or Graylog output
@@ -119,28 +120,25 @@ async function log(level, logObject, config) {
 }
 
 // Function to initialize the logger with configurations
-function createLogger(customConfig = {}) {
-    const defaultConfig = {
+export function createLogger(customConfig: Partial<LoggerConfig> = {}): Logger {
+    const defaultConfig: LoggerConfig = {
         GRAYLOG_HOST: process.env.GRAYLOG_HOST || '127.0.0.1',
-        GRAYLOG_TRANSPORT: process.env.GRAYLOG_TRANSPORT || 'udp', // udp or tcp
-        GRAYLOG_PORT: process.env.GRAYLOG_PORT || 12201,
+        GRAYLOG_TRANSPORT: (process.env.GRAYLOG_TRANSPORT as Transport) || 'udp',
+        GRAYLOG_PORT: parseInt(process.env.GRAYLOG_PORT || '12201', 10),
         GRAYLOG_APPLICATION_NAME: process.env.GRAYLOG_APPLICATION_NAME || 'my-application',
         GRAYLOG_ENVIRONMENT: process.env.GRAYLOG_ENVIRONMENT || 'development',
-        GRAYLOG_MIN_LEVEL_LOCAL: process.env.GRAYLOG_MIN_LEVEL_LOCAL || 'debug',
-        GRAYLOG_MIN_LEVEL_REMOTE: process.env.GRAYLOG_MIN_LEVEL_REMOTE || 'info',
-        GRAYLOG_OUTPUT: process.env.GRAYLOG_OUTPUT || 'both', // local, remote, both
+        GRAYLOG_MIN_LEVEL_LOCAL: (process.env.GRAYLOG_MIN_LEVEL_LOCAL as LogLevel) || 'debug',
+        GRAYLOG_MIN_LEVEL_REMOTE: (process.env.GRAYLOG_MIN_LEVEL_REMOTE as LogLevel) || 'info',
+        GRAYLOG_OUTPUT: (process.env.GRAYLOG_OUTPUT as any) || 'both',
     };
 
-    const config = { ...defaultConfig, ...customConfig };
+    const config: LoggerConfig = { ...defaultConfig, ...customConfig };
 
     return {
-        debug: (logObject) => log('debug', { ...logObject, stringLevel: 'debug' }, config),
-        info: (logObject) => log('info', { ...logObject, stringLevel: 'info' }, config),
-        warn: (logObject) => log('warn', { ...logObject, stringLevel: 'warn' }, config),
-        error: (logObject) => log('error', { ...logObject, stringLevel: 'error' }, config),
-        critical: (logObject) => log('critical', { ...logObject, stringLevel: 'critical' }, config)
+        debug: (logObject: LogObject) => log('debug', { ...logObject, stringLevel: 'debug' }, config),
+        info: (logObject: LogObject) => log('info', { ...logObject, stringLevel: 'info' }, config),
+        warn: (logObject: LogObject) => log('warn', { ...logObject, stringLevel: 'warn' }, config),
+        error: (logObject: LogObject) => log('error', { ...logObject, stringLevel: 'error' }, config),
+        critical: (logObject: LogObject) => log('critical', { ...logObject, stringLevel: 'critical' }, config)
     };
 }
-
-// Exporting for testing purposes
-module.exports = { createLogger, mapLogLevel, createGelfMessage, getRemoteAddress, logToConsole, sendUdpMessage, sendTcpMessage, sendLogToGraylog, log };
